@@ -3,10 +3,10 @@ import pg from 'pg';
 const { Pool } = pg;
 
 const pool = new Pool({
-    user: process.env.DB_USER,
+    user: 'postgres',
     host: 'localhost',
-    database: process.env.DB_NAME,
-    password: process.env.DB_PASSWORD,
+    database: 'employee_db',
+    password: 'postgres1!',
     port: 5432,
   });
 
@@ -16,7 +16,7 @@ async function mainMenu() {
       type: 'list',
       name: 'action',
       message: 'What would you like to do?',
-      choices: ['View All Departments', 'View All Roles', 'View All Employees', 'Add and Employee', 'Exit']
+      choices: ['View All Departments', 'View All Roles', 'View All Employees', 'Add a Department', 'Add a Role', 'Add an Employee', 'Update an Employee Role', 'Exit']
     }
   ]);
 
@@ -48,26 +48,37 @@ async function mainMenu() {
         return;
   }
   mainMenu();
-}
+};
 
 async function viewDepts() {
-  const res = await pool.query('SELECT * FROM departmentTb');
-  console.table(res.rows);
+  try {
+    const res = await pool.query('SELECT * FROM departmentTb');
+    console.table(res.rows);
+  } catch (err) {
+    console.error('Error executing query', err);
+  }
 }
 
 async function viewRoles() {
+  try {
     const res = await pool.query('SELECT * FROM roleTb');
     console.table(res.rows);
+  } catch (err) {
+    console.error('Error executing query', err);
+  }
 }
 
 async function viewEmployees() {
+  try {
     const res = await pool.query('SELECT * FROM employeeTb');
     console.table(res.rows);
+  } catch (err) {
+    console.error('Error executing query', err);
+  }
 }
 
 async function getChoicesFromDb() {
   try {
-    await pool.connect();
     const res = await pool.query('SELECT title FROM roleTb');
     return res.rows.map(row => row.name);
   } catch (err) {
@@ -100,16 +111,37 @@ async function addEmployee() {
   await pool.query('INSERT INTO employeeTb (first_name, last_name, role_id) VALUES (?, ?, ?)',
     [newEmployee.firstName, newEmployee.lastName, newEmployee.role_id]
   );
-  console.log("Employee added successfully.");
+  console.log('Employee added successfully.');
 }
 
 async function addDept() {
-
+  const newDept = await inquirer.prompt([
+    {
+      type: 'input',
+      name: 'dept_name',
+      message: 'Enter New Department Name'
+    }
+  ]);
+  await pool.query('INSERT INTO departmentTb (deptName) VALUES (?)',
+  [newDept.dept_name]
+  );
+  console.log('Department added successfully.')
 }
 
 async function addRole() {
-
+  const newRole = await inquirer.prompt([
+    {
+      type: 'input',
+      name: 'role_title',
+      message: 'Enter New Role Title'
+    }
+  ]);
+  await pool.query('INSERT INTO roleTb (title) VALUES (?)',
+  [newRole.role_title]
+  );
+  console.log('Role added successfully.')
 }
+
 
 async function updateEmployee() {
   const res = await pool.query('SELECT role FROM employeeTb');
