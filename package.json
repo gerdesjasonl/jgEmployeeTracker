@@ -1,7 +1,7 @@
 {
   "name": "name_of_app_here",
   "version": "1.0.0",
-  "description": "",
+  "description": "## Your Task",
   "type": "module",
   "main": "index.js",
   "scripts": {
@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "dotenv": "^16.4.5",
-    "inquirer": "8.2.4",
+    "inquirer": "^8.2.4",
     "pg": "^8.11.3"
   },
   "keywords": [],
@@ -22,5 +22,13 @@
     "@types/inquirer": "^9.0.7",
     "@types/pg": "^8.11.6",
     "typescript": "^5.2.2"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gerdesjasonl/jgEmployeeTracker.git"
+  },
+  "bugs": {
+    "url": "https://github.com/gerdesjasonl/jgEmployeeTracker/issues"
+  },
+  "homepage": "https://github.com/gerdesjasonl/jgEmployeeTracker#readme"
 }

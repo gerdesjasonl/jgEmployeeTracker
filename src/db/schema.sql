@@ -4,19 +4,19 @@ CREATE DATABASE employee_db;
 
 \c employee_db;
 
-CREATE TABLE department (
+CREATE TABLE departmentTb (
     id SERIAL PRIMARY KEY,
-    name VARCHAR(30) UNIQUE NOT NULL
+    deptName VARCHAR(30) UNIQUE NOT NULL
     ); 
 
-CREATE TABLE role (
+CREATE TABLE roleTb (
     id SERIAL PRIMARY KEY,
     title VARCHAR(30) UNIQUE NOT NULL, 
     salary DECIMAL NOT NULL, 
     department_id INTEGER NOT NULL REFERENCES department(id)
     ); 
 
-CREATE TABLE employee (
+CREATE TABLE employeeTb (
     id SERIAL PRIMARY KEY,
     first_name VARCHAR(30) NOT NULL,
     last_name VARCHAR(30) NOT NULL,
