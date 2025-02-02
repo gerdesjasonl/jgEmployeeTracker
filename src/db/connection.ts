@@ -22,4 +22,16 @@ const connectToDb = async () => {
   }
 };
 
+const getChoicesFromDb = async () => {
+  try {
+    await pool.connect();
+    const res = await pool.query('SELECT title FROM role');
+    await pool.end();
+    return res.rows.map(row => row.name);
+  } catch (err) {
+    console.error('Error fetching data:', err);
+    return [];
+  }
+}
+
 export { pool, connectToDb };
