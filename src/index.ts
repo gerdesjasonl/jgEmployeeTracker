@@ -1,12 +1,12 @@
-const inquirer = require('inquirer');
+import inquirer from 'inquirer';
 import pg from 'pg';
 const { Pool } = pg;
 
 const pool = new Pool({
     user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
     host: 'localhost',
     database: process.env.DB_NAME,
+    password: process.env.DB_PASSWORD,
     port: 5432,
   });
 
@@ -47,7 +47,6 @@ async function mainMenu() {
         pool.end();
         return;
   }
-
   mainMenu();
 }
 
@@ -66,29 +65,41 @@ async function viewEmployees() {
     console.table(res.rows);
 }
 
+async function getChoicesFromDb() {
+  try {
+    await pool.connect();
+    const res = await pool.query('SELECT title FROM roleTb');
+    return res.rows.map(row => row.name);
+  } catch (err) {
+    console.error('Error fetching data:', err);
+    return [];
+  }
+}
+
 async function addEmployee() {
-  const { employee } = await inquirer.prompt([
+  const choices = await getChoicesFromDb();
+  const newEmployee = await inquirer.prompt([
     {
         type: 'input',
         name: 'firstName',
         message: 'Enter first name:',
-        validate: input => input ? true : 'Name cannot be empty'
     },
     {
         type: 'input',
         name: "lastName",
         message: "Enter last name:",
-        validate: input => input ? true : 'Name cannot be empty'
     },
     {
         type: 'list',
-        name: "role",
+        name: "role_id",
         message: "Select Employee Role",
-        choices: res.rows.map(row => ({ name: row.name, value: row.role }))
-    },
+        choices: choices
+    } 
   ]);
 
-  await pool.query('INSERT INTO employeeTb(employee) VALUES');
+  await pool.query('INSERT INTO employeeTb (first_name, last_name, role_id) VALUES (?, ?, ?)',
+    [newEmployee.firstName, newEmployee.lastName, newEmployee.role_id]
+  );
   console.log("Employee added successfully.");
 }
 
@@ -111,7 +122,7 @@ async function updateEmployee() {
     }
   ]);
 
-  await pool.query('UPDATE employeeTb SET role', [role]);
+  await pool.query('UPDATE employeeTb SET role_id', [role]);
   console.log("Role updated successfully.");
 }
 
