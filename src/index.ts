@@ -10,6 +10,7 @@ const pool = new Pool({
     port: 5432,
   });
 
+// This is the Main Menu for the CLI
 async function mainMenu() {
   const { action } = await inquirer.prompt([
     {
@@ -50,6 +51,7 @@ async function mainMenu() {
   mainMenu();
 };
 
+// This is for the view all departments action
 async function viewDepts() {
   try {
     const res = await pool.query('SELECT * FROM departmentTb');
@@ -59,6 +61,7 @@ async function viewDepts() {
   }
 }
 
+// This is for the view all roles action
 async function viewRoles() {
   try {
     const res = await pool.query('SELECT * FROM roleTb');
@@ -68,6 +71,7 @@ async function viewRoles() {
   }
 }
 
+// This is for the view all employees action
 async function viewEmployees() {
   try {
     const res = await pool.query('SELECT * FROM employeeTb');
@@ -77,19 +81,24 @@ async function viewEmployees() {
   }
 }
 
-async function getChoicesFromDb() {
-  try {
-    const res = await pool.query('SELECT title FROM roleTb');
-    return res.rows.map(row => row.name);
-  } catch (err) {
-    console.error('Error fetching data:', err);
-    return [];
-  }
-}
+// // This function lists available role titles when creating a new employee
+// // I chose to comment this out in favor of try block below. This allows for selection of roles based on title but is added to database using corresponding id.
+// async function getChoicesFromDb() {
+//   try {
+//     const res = await pool.query('SELECT id, title FROM roleTb');
+//     return res.rows.map(row => row.title);
+//   } catch (err) {
+//     console.error('Error fetching data:', err);
+//     return [];
+//   }
+// }
 
+// This is for the Add Employee action
 async function addEmployee() {
-  const choices = await getChoicesFromDb();
-  const newEmployee = await inquirer.prompt([
+  try {
+    const roles = await pool.query('SELECT id, title FROM roleTb');
+    const choices = roles.rows.map(role => ({name: role.title, value: role.id}));
+    const newEmployee = await inquirer.prompt([
     {
         type: 'input',
         name: 'firstName',
@@ -107,13 +116,16 @@ async function addEmployee() {
         choices: choices
     } 
   ]);
-
-  await pool.query('INSERT INTO employeeTb (first_name, last_name, role_id) VALUES (?, ?, ?)',
-    [newEmployee.firstName, newEmployee.lastName, newEmployee.role_id]
-  );
-  console.log('Employee added successfully.');
+    await pool.query('INSERT INTO employeeTb (first_name, last_name, role_id) VALUES ($1, $2, $3)',
+      [newEmployee.firstName, newEmployee.lastName, newEmployee.role_id]
+    );
+    console.log('Employee added successfully.');
+  } catch (err) {
+    console.error('Error adding employee', err);
+  }
 }
 
+// This is for the Add Department action
 async function addDept() {
   const newDept = await inquirer.prompt([
     {
@@ -122,27 +134,37 @@ async function addDept() {
       message: 'Enter New Department Name'
     }
   ]);
-  await pool.query('INSERT INTO departmentTb (deptName) VALUES (?)',
+  await pool.query('INSERT INTO departmentTb (deptName) VALUES ($1)',
   [newDept.dept_name]
   );
   console.log('Department added successfully.')
 }
 
+// This is for the Add Role action
 async function addRole() {
-  const newRole = await inquirer.prompt([
+  try {
+    const newRole = await inquirer.prompt([
     {
       type: 'input',
       name: 'role_title',
       message: 'Enter New Role Title'
+    },
+    {
+      type: 'number',
+      name: 'salary',
+      message: 'Enter Salary for New Role'
     }
   ]);
-  await pool.query('INSERT INTO roleTb (title) VALUES (?)',
-  [newRole.role_title]
+  await pool.query('INSERT INTO roleTb (title, salary) VALUES ($1, $2)',
+  [newRole.role_title, newRole.salary]
   );
-  console.log('Role added successfully.')
+    console.log('Role added successfully.')
+  } catch (err) {
+    console.error('Error adding role', err);
+  }
 }
 
-
+// This is for the Update Employee Role action
 async function updateEmployee() {
   const res = await pool.query('SELECT role FROM employeeTb');
   const { role } = await inquirer.prompt([
