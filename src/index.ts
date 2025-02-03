@@ -65,7 +65,7 @@ async function viewDepts() {
 // This is for the view all roles action
 async function viewRoles() {
   try {
-    const res = await pool.query('SELECT * FROM roleTb');
+    const res = await pool.query('SELECT roleTb.id, roleTb.title, roleTb.salary, roleTb.department_id, departmentTb.deptname FROM roleTb LEFT JOIN departmentTb ON roleTb.department_id = departmentTb.id');
     console.table(res.rows);
   } catch (err) {
     console.error('Error executing query', err);
@@ -75,7 +75,7 @@ async function viewRoles() {
 // This is for the view all employees action
 async function viewEmployees() {
   try {
-    const res = await pool.query('SELECT * FROM employeeTb');
+    const res = await pool.query('SELECT employeeTb.id, employeeTb.first_name, employeeTb.last_name, employeeTb.role_id, roleTb.title FROM employeeTb LEFT JOIN roleTb ON employeeTb.role_id = roleTb.id');
     console.table(res.rows);
   } catch (err) {
     console.error('Error executing query', err);
@@ -174,7 +174,7 @@ async function addRole() {
       name: 'salary',
       message: 'Enter Salary for New Role'
     },
-  // This checkbox will populate from the department table
+  // This list will populate from the department table
     {
       type: 'list',
       name: 'department_id',
