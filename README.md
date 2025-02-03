@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
 </head>
 <header>
  <h1 style="background-color: black;text-align: center;color:azure;">  jgEmployeeTracker  <img src='https://img.shields.io/badge/License-MIT-yellow.svg'>  </h1>
