@@ -126,11 +126,11 @@ async function addEmployee() {
         type: 'list',
         name: 'manager',
         message: 'Select the Manager for this employee',
-        choices: emplChoices
+        choices: [{name: 'None', value: null }, ...emplChoices] 
     }
   ]);
-    await pool.query('INSERT INTO employeeTb (first_name, last_name, role_id) VALUES ($1, $2, $3)',
-      [newEmployee.firstName, newEmployee.lastName, newEmployee.role_id]
+    await pool.query('INSERT INTO employeeTb (first_name, last_name, role_id, manager_id) VALUES ($1, $2, $3, $4)',
+      [newEmployee.firstName, newEmployee.lastName, newEmployee.role_id, newEmployee.manager_id || null]
     );
     console.log('Employee added successfully.');
   } catch (err) {

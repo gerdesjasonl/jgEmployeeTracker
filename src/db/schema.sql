@@ -8,7 +8,6 @@ CREATE TABLE departmentTb (
     id SERIAL PRIMARY KEY,
     deptName VARCHAR(30) UNIQUE NOT NULL
     );
-SELECT * FROM departmentTb LIMIT 5;
 
 CREATE TABLE roleTb (
     id SERIAL PRIMARY KEY,
@@ -25,3 +24,5 @@ CREATE TABLE employeeTb (
     manager_id INT,
     FOREIGN KEY (manager_id) REFERENCES employeeTb(id)
     );
+
+ALTER TABLE employeeTb ALTER COLUMN manager_id DROP NOT NULL;
