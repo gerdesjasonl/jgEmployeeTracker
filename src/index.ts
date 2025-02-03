@@ -166,20 +166,43 @@ async function addRole() {
 
 // This is for the Update Employee Role action
 async function updateEmployee() {
-  const res = await pool.query('SELECT role FROM employeeTb');
-  const { role } = await inquirer.prompt([
+  try {
+    // This is getting employees to choose from
+      const empl= await pool.query('SELECT id, first_name, last_name FROM employeeTb');
+      const emplChoices = empl.rows.map(emp => ({
+        name: `${emp.first_name} ${emp.last_name}`,
+        value: emp.id
+      }));
+
+    // This is getting roles to choose from
+      const roles = await pool.query('SELECT id, title FROM roleTb');
+      const roleChoices = roles.rows.map(role => ({
+        name: role.title,
+        value: role.id
+      }));
+
+    // This is the Inquirer prompt for updating roles
+      const {employee_id, role_id} = await inquirer.prompt([
     {
       type: 'list',
-      name: 'role',
-      message: 'Update employee role:',
-      choices: res.rows.map(row => ({ name: row.name, value: row.role }))
+      name: 'employee_id',
+      message: 'Select Employee to Update Role',
+      choices: emplChoices
+    },
+    {
+      type: 'list',
+      name: 'role_id',
+      message: 'Select New Role to Update',
+      choices: roleChoices
     }
-  ]);
-
-  await pool.query('UPDATE employeeTb SET role_id', [role]);
-  console.log("Role updated successfully.");
+    ]);
+  // Update the employee role in the database
+    await pool.query('UPDATE employeeTb SET role_id = $1 WHERE id = $2', [role_id, employee_id]);
+    console.log('Role updated successfully.');
+  } catch (err) {
+    console.log('Error updating employee role.', err)
+  }
 }
-
 
 // Start the CLI
 mainMenu();
