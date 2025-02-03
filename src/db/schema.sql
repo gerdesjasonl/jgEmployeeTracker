@@ -8,6 +8,7 @@ CREATE TABLE departmentTb (
     id SERIAL PRIMARY KEY,
     deptName VARCHAR(30) UNIQUE NOT NULL
     );
+SELECT * FROM departmentTb LIMIT 5;
 
 CREATE TABLE roleTb (
     id SERIAL PRIMARY KEY,

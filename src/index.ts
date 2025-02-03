@@ -97,7 +97,14 @@ async function viewEmployees() {
 async function addEmployee() {
   try {
     const roles = await pool.query('SELECT id, title FROM roleTb');
-    const choices = roles.rows.map(role => ({name: role.title, value: role.id}));
+    const roleChoices = roles.rows.map(role => ({name: role.title, value: role.id}));
+  // I was not sure if declaring these variables universaly would harm the overall code, I declared them in two different functions.  
+    const empl = await pool.query('SELECT id, first_name, last_name FROM employeeTb');
+    const emplChoices = empl.rows.map(emp => ({
+        name: `${emp.first_name} ${emp.last_name}`,
+        value: emp.id
+      }));
+
     const newEmployee = await inquirer.prompt([
     {
         type: 'input',
@@ -106,15 +113,21 @@ async function addEmployee() {
     },
     {
         type: 'input',
-        name: "lastName",
-        message: "Enter last name:",
+        name: 'lastName',
+        message: 'Enter last name:',
     },
     {
         type: 'list',
-        name: "role_id",
-        message: "Select Employee Role",
-        choices: choices
-    } 
+        name: 'role_id',
+        message: 'Select Employee Role',
+        choices: roleChoices
+    },
+    {
+        type: 'list',
+        name: 'manager',
+        message: 'Select the Manager for this employee',
+        choices: emplChoices
+    }
   ]);
     await pool.query('INSERT INTO employeeTb (first_name, last_name, role_id) VALUES ($1, $2, $3)',
       [newEmployee.firstName, newEmployee.lastName, newEmployee.role_id]
@@ -143,9 +156,9 @@ async function addDept() {
 // This is for the Add Role action
 async function addRole() {
   try {
-    const depts = await pool.query('SELECT id, deptName FROM departmentTb');
+    const depts = await pool.query('SELECT id, deptname FROM departmentTb');
     const deptChoices = depts.rows.map(dept => ({
-        name: dept.deptName,
+        name: String(dept.deptname),
         value: dept.id
       }));
 
