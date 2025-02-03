@@ -2,6 +2,7 @@ import inquirer from 'inquirer';
 import pg from 'pg';
 const { Pool } = pg;
 
+// The Dotenv would not work for me here, so I entered , manually
 const pool = new Pool({
     user: 'postgres',
     host: 'localhost',
@@ -130,7 +131,7 @@ async function addEmployee() {
     }
   ]);
     await pool.query('INSERT INTO employeeTb (first_name, last_name, role_id, manager_id) VALUES ($1, $2, $3, $4)',
-      [newEmployee.firstName, newEmployee.lastName, newEmployee.role_id, newEmployee.manager_id || null]
+      [newEmployee.firstName, newEmployee.lastName, newEmployee.role_id, newEmployee.manager || null]
     );
     console.log('Employee added successfully.');
   } catch (err) {
