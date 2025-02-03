@@ -143,7 +143,13 @@ async function addDept() {
 // This is for the Add Role action
 async function addRole() {
   try {
-    const newRole = await inquirer.prompt([
+    const depts = await pool.query('SELECT id, deptName FROM departmentTb');
+    const deptChoices = depts.rows.map(dept => ({
+        name: dept.deptName,
+        value: dept.id
+      }));
+
+    const {role_title, salary, department_id} = await inquirer.prompt([
     {
       type: 'input',
       name: 'role_title',
@@ -153,10 +159,17 @@ async function addRole() {
       type: 'number',
       name: 'salary',
       message: 'Enter Salary for New Role'
-    }
+    },
+  // This checkbox will populate from the department table
+    {
+      type: 'list',
+      name: 'department_id',
+      message: 'Select Department for new Role',
+      choices: deptChoices
+    },
   ]);
-  await pool.query('INSERT INTO roleTb (title, salary) VALUES ($1, $2)',
-  [newRole.role_title, newRole.salary]
+  await pool.query('INSERT INTO roleTb (title, salary, department_id) VALUES ($1, $2, $3)',
+  [role_title, salary, department_id]
   );
     console.log('Role added successfully.')
   } catch (err) {
